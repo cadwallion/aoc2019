@@ -45,6 +45,29 @@ impl IntcodeComputer {
     fn add(&mut self, addend1_pos: usize, addend2_pos: usize, sum_pos: usize) {
         self.codes[sum_pos] = self.codes[addend1_pos] + self.codes[addend2_pos];
     }
+
+    fn compute(&mut self, noun: usize, verb: usize) -> usize {
+        self.codes[1] = noun;
+        self.codes[2] = verb;
+        loop {
+            match self.codes[self.position] {
+                1 => self.add(
+                    self.codes[self.position + 1],
+                    self.codes[self.position + 2],
+                    self.codes[self.position + 3],
+                ),
+                2 => self.multiply(
+                    self.codes[self.position + 1],
+                    self.codes[self.position + 2],
+                    self.codes[self.position + 3],
+                ),
+                99 => break,
+                _ => panic!("Unknown opcode!"),
+            }
+            self.position += 4;
+        }
+        self.codes[0]
+    }
 }
 
 // opcodes:
@@ -65,26 +88,8 @@ fn day2a() {
         codes: codes,
         position: 0,
     };
-    computer.codes[1] = 12;
-    computer.codes[2] = 2;
-    loop {
-        match computer.codes[computer.position] {
-            1 => computer.add(
-                computer.codes[computer.position + 1],
-                computer.codes[computer.position + 2],
-                computer.codes[computer.position + 3],
-            ),
-            2 => computer.multiply(
-                computer.codes[computer.position + 1],
-                computer.codes[computer.position + 2],
-                computer.codes[computer.position + 3],
-            ),
-            99 => break,
-            _ => panic!("Unknown opcode!"),
-        }
-        computer.position += 4;
-    }
-    println!("Day2a: {}", computer.codes[0]);
+    let result = computer.compute(12, 2);
+    println!("Day2a: {}", result);
 }
 
 fn main() {
