@@ -92,8 +92,31 @@ fn day2a() {
     println!("Day2a: {}", result);
 }
 
+fn day2b() {
+    let data = fs::read_to_string("./inputs/day2.txt").expect("Cannot read");
+    let output = 19690720;
+    for noun in 0..99 {
+        for verb in 0..99 {
+            let codes: Vec<usize> = data
+                .trim()
+                .split(",")
+                .map(|code| code.parse::<usize>().unwrap())
+                .collect();
+            let mut computer = IntcodeComputer {
+                codes: codes,
+                position: 0,
+            };
+            if computer.compute(noun, verb) == output {
+                println!("Day2b: {}", 100 * noun + verb);
+                break;
+            }
+        }
+    }
+}
+
 fn main() {
     day1a();
     day1b();
     day2a();
+    day2b();
 }
