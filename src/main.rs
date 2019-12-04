@@ -16,7 +16,6 @@ fn get_fuel_cost(mass: f64) -> f64 {
     ((mass / 3.0).floor()) - 2.0
 }
 
-// 4841054
 fn day1b() {
     let file = File::open("./inputs/day1.txt").unwrap();
     let reader = BufReader::new(file);
@@ -70,14 +69,7 @@ impl IntcodeComputer {
     }
 }
 
-// opcodes:
-// 99 - exit
-// 1 - add two numbers from the positions in index 1/2, store at position in index 3
-// 2 - multiply two numbers from the positions in index 1/2, store at position in index 3
-// when complete with an opcode, advance 4 positions
 fn day2a() {
-    //let file = File::open("./inputs/day2.txt").unwrap();
-    //let reader = BufReader::new(file);
     let data = fs::read_to_string("./inputs/day2.txt").expect("Cannot read");
     let codes: Vec<usize> = data
         .trim()
