@@ -52,7 +52,7 @@ impl IntcodeComputer {
 // 1 - add two numbers from the positions in index 1/2, store at position in index 3
 // 2 - multiply two numbers from the positions in index 1/2, store at position in index 3
 // when complete with an opcode, advance 4 positions
-fn day2() {
+fn day2a() {
     //let file = File::open("./inputs/day2.txt").unwrap();
     //let reader = BufReader::new(file);
     let data = fs::read_to_string("./inputs/day2.txt").expect("Cannot read");
@@ -65,6 +65,8 @@ fn day2() {
         codes: codes,
         position: 0,
     };
+    computer.codes[1] = 12;
+    computer.codes[2] = 2;
     loop {
         match computer.codes[computer.position] {
             1 => computer.add(
@@ -88,5 +90,5 @@ fn day2() {
 fn main() {
     day1a();
     day1b();
-    day2();
+    day2a();
 }
