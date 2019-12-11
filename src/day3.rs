@@ -4,11 +4,14 @@ type Point = (isize, isize);
 struct Segment {
     start: Point,
     end: Point,
+    distance: isize,
 }
 
 impl Segment {
     fn crossing(vertical: &Segment, horizontal: &Segment) -> bool {
-        vertical.start.0 >= horizontal.start.0
+        vertical.start.1 != 0
+            && horizontal.start.0 != 0
+            && vertical.start.0 >= horizontal.start.0
             && vertical.start.0 <= horizontal.end.0
             && ((vertical.start.1 >= horizontal.start.1 && vertical.end.1 <= horizontal.start.1)
                 || (vertical.start.1 <= horizontal.start.1 && vertical.end.1 >= horizontal.start.1))
@@ -35,6 +38,7 @@ impl Wire {
         let segment = Segment {
             start: (self.x, self.y),
             end: (self.x, new_y),
+            distance: distance.abs(),
         };
         self.y = new_y;
         self.segments.push(segment);
@@ -45,6 +49,7 @@ impl Wire {
         let segment = Segment {
             start: (self.x, self.y),
             end: (new_x, self.y),
+            distance: distance.abs(),
         };
         self.x = new_x;
         self.segments.push(segment);
@@ -76,14 +81,7 @@ impl Wire {
 // if going up/down, collision detection is only on the Y axis
 // calculate the x/y distance from origin to collision
 pub fn a() {
-    let data = fs::read_to_string("./inputs/day3.txt").expect("Cannot read");
-    let wire_paths: Vec<Vec<&str>> = data
-        .trim()
-        .split("\n")
-        .map(|path| path.split(",").collect())
-        .collect();
-    let wire1 = Wire::from_paths(&wire_paths[0]);
-    let wire2 = Wire::from_paths(&wire_paths[1]);
+    let (wire1, wire2) = get_wires();
     let mut crossings = Vec::<Point>::new();
     for segment1 in wire1.segments.iter() {
         for segment2 in wire2.segments.iter() {
@@ -118,4 +116,53 @@ pub fn a() {
         .unwrap();
 
     println!("Day 3a: {}", shortest);
+}
+
+fn get_wires() -> (Wire, Wire) {
+    let data = fs::read_to_string("./inputs/day3.txt").expect("Cannot read");
+    let wire_paths: Vec<Vec<&str>> = data
+        .trim()
+        .split("\n")
+        .map(|path| path.split(",").collect())
+        .collect();
+    let wire1 = Wire::from_paths(&wire_paths[0]);
+    let wire2 = Wire::from_paths(&wire_paths[1]);
+    (wire1, wire2)
+}
+
+fn distance_between(a: isize, b: isize) -> isize {
+    if a > b {
+        (b - a).abs()
+    } else {
+        (a - b).abs()
+    }
+}
+
+pub fn b() {
+    let (wire1, wire2) = get_wires();
+    let mut shortest = 0;
+    let mut segment1_steps = 0;
+    for segment1 in wire1.segments.iter() {
+        let mut segment2_steps = 0;
+        for segment2 in wire2.segments.iter() {
+            if (segment1.is_vertical()
+                && segment2.is_horizontal()
+                && Segment::crossing(segment1, segment2))
+                || (segment2.is_vertical()
+                    && segment1.is_horizontal()
+                    && Segment::crossing(segment2, segment1))
+            {
+                let segment1_partial = distance_between(segment1.start.1, segment2.start.1);
+                let segment2_partial = distance_between(segment2.start.0, segment1.start.0);
+                let steps = segment1_steps + segment2_steps + segment1_partial + segment2_partial;
+                if shortest == 0 || steps < shortest {
+                    shortest = steps
+                }
+            }
+            segment2_steps += segment2.distance;
+        }
+        segment1_steps += segment1.distance;
+    }
+
+    println!("Day 3b: {}", shortest);
 }
